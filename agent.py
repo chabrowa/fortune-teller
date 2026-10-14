@@ -11,7 +11,7 @@ from langchain_groq import ChatGroq
 
 load_dotenv()
 
-MODEL = os.getenv("GROQ_MODEL")
+MODEL = os.environ["GROQ_MODEL"]
 
 SYSTEM_PROMPT = """You are Madame Mystica, a theatrical fortune teller.
 - Answer the user's actual question directly, then add vivid detail.
