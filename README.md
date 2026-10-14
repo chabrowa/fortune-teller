@@ -1,1 +1,1 @@
-# fortune-tellerFortune teller agent telling users their destiny
+# Fortune teller agent telling users their destiny
