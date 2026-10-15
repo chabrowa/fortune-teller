@@ -6,9 +6,13 @@ services:
     user: root
     ports:
       - "8080:8080"
+    environment:
+      KUBECONFIG: /kube/config
     volumes:
       - jenkins_home:/var/jenkins_home
       - /var/run/docker.sock:/var/run/docker.sock
+      # local use only
+      - ${HOME}/.kube/config:/kube/config:ro
     restart: unless-stopped
 
 volumes:

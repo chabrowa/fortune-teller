@@ -2,7 +2,12 @@ pipeline {
     agent any
 
     triggers {
-        pollSCM('H/60 * * * *')
+        pollSCM('H/5 * * * *')
+    }
+
+    environment {
+        IMAGE = "fortune-teller:${BUILD_NUMBER}"
+        KUBECTL = 'kubectl --context docker-desktop --server https://host.docker.internal:6443 --tls-server-name kubernetes.docker.internal'
     }
 
     stages {
@@ -32,7 +37,19 @@ pipeline {
 
         stage('Build image') {
             steps {
-                sh 'docker build -t fortune-teller:${BUILD_NUMBER} -t fortune-teller:latest .'
+                sh 'docker build -t ${IMAGE} -t fortune-teller:latest .'
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                sh '''
+                    $KUBECTL apply -f k8s/service.yaml
+                    # Deploy this build's image instead of :latest so every build triggers a rollout
+                    sed "s|image: fortune-teller:latest|image: ${IMAGE}|" k8s/deployment.yaml \
+                        | $KUBECTL apply -f -
+                    $KUBECTL rollout status deployment/fortune-teller --timeout=180s
+                '''
             }
         }
     }
